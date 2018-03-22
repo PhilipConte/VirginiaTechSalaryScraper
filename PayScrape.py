@@ -3,9 +3,9 @@ from pathlib import Path
 import pandas as pd
 import requests, pickle, os
 
-fileDir = 'files'
+fileDir = "files"
 rawPickleFile = os.path.join(fileDir, "rawPages.p")
-csvFile = os.path.join(fileDir, 'VTsalaries.csv')
+csvFile = os.path.join(fileDir, "VTsalaries.csv")
 
 year = 2016
 baseURL = "http://data.richmond.com/salaries/"+str(year)+"/state/virginia-polytechnic-institute-and-state-university-virginia-tech?page="
@@ -29,7 +29,7 @@ def getList(inputList):
     theList = []
     for index, page in enumerate(inputList):
         soup = BeautifulSoup(page.content, "html.parser")
-        values = soup.findAll('td')[10:]
+        values = soup.findAll("td")[10:]
         
         empList = list(zip(*(iter(values),)*3))
         for emp in empList:
