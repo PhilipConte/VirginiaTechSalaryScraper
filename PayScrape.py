@@ -59,5 +59,13 @@ def moneyToInt(moneyStr):
 def intToMoney(moneyInt):
     return locale.currency( moneyInt, grouping=True )
 
-empList = returnData()
-empList.to_csv(csvFile, index=None, sep=",")
+def pLen(df):
+    return len(df.index)
+
+def analyses(employees):
+    employees["Total gross pay"] = employees["Total gross pay"].apply(lambda x: moneyToInt(x))
+    withheld = employees.loc[employees["Name"] == "(Name withheld)"]
+    print("the", str(pLen(withheld)), "employees with withheld names make up", "{:.0%}".format(1.0*pLen(withheld)/pLen(employees)), "of the", pLen(employees), "employees")
+
+employees = returnData()
+employees.to_csv(csvFile, index=None, sep=",")
