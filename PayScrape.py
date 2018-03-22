@@ -1,27 +1,29 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
 import pandas as pd
-import requests, pickle
+import requests, pickle, os
 
-rawPickleFile = "rawPages.p"
+fileDir = 'files'
+rawPickleFile = os.path.join(fileDir, "rawPages.p")
+csvFile = os.path.join(fileDir, 'VTsalaries.csv')
 
 year = 2016
 baseURL = "http://data.richmond.com/salaries/"+str(year)+"/state/virginia-polytechnic-institute-and-state-university-virginia-tech?page="
 
 def downloadPages():
     page = 1
-    reqList = []
-
+    pages = []
+    print("Downloading pages:")
     while True:
         req = requests.get(baseURL+str(page))
         req.raise_for_status()
-        if (len(reqList) > 0 and req.content == reqList[-1].content):
+        if (len(pages) > 0 and req.content == pages[-1].content):
             break
-        reqList.append(req)
+        pages.append(req)
         page += 1
         print(page)
-    
-    pickle.dump(reqList, open(rawPickleFile, "wb"))
+    print("done")
+    pickle.dump(pages, open(rawPickleFile, "wb"))
 
 def getList(inputList):
     theList = []
@@ -50,4 +52,4 @@ def returnData():
     return listToPd(getList(pickle.load(open(rawPickleFile, "rb"))))
 
 empList = returnData()
-empList.to_csv('VTsalaries.csv', index=None, sep=",")
+empList.to_csv(csvFile, index=None, sep=",")
