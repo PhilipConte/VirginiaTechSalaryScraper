@@ -62,10 +62,14 @@ def intToMoney(moneyInt):
 def pLen(df):
     return len(df.index)
 
-def analyses(employees):
-    employees["Total gross pay"] = employees["Total gross pay"].apply(lambda x: moneyToInt(x))
-    withheld = employees.loc[employees["Name"] == "(Name withheld)"]
-    print("the", str(pLen(withheld)), "employees with withheld names make up", "{:.0%}".format(1.0*pLen(withheld)/pLen(employees)), "of the", pLen(employees), "employees")
+def analyses(emps):
+    emps["Total gross pay"] = emps["Total gross pay"].apply(lambda x: moneyToInt(x))
+    withheld = emps.loc[emps["Name"] == "(Name withheld)"]
+    print("the", str(pLen(withheld)), "employees with withheld names make up",
+        "{:.0%}".format(1.0*pLen(withheld)/pLen(emps)), "of the", pLen(emps), "employees.",
+        "They cost", intToMoney(withheld["Total gross pay"].sum()), "or",
+        "{:.0%}".format(1.0*withheld["Total gross pay"].sum()/emps["Total gross pay"].sum()),
+        "of the total", intToMoney(emps["Total gross pay"].sum()))
 
 employees = returnData()
 employees.to_csv(csvFile, index=None, sep=",")
