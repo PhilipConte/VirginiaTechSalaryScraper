@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
 import pandas as pd
-import requests, pickle, locale, os
-
-locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
+import requests, pickle, os
 
 fileDir = "files"
 rawPickleFile = os.path.join(fileDir, "rawPages.p")
@@ -52,14 +50,5 @@ def returnData():
     if not Path(rawPickleFile).is_file():
         downloadPages()
     return listToPd(getList(pickle.load(open(rawPickleFile, "rb"))))
-
-def moneyToInt(moneyStr):
-    return int(''.join(ch for ch in moneyStr if ch.isdigit()))
-
-def intToMoney(moneyInt):
-    return locale.currency( moneyInt, grouping=True )
-
-def pLen(df):
-    return len(df.index)
 
 returnData().to_csv(csvFile, index=None, sep=",")

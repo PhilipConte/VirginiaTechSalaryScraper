@@ -1,26 +1,39 @@
 import pandas as pd
 import locale, os
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
+
 def file_loc(file_name):
     return os.path.join("files", file_name)
 
-def parse_dollar(dollars):
+def from_dollar(dollars):
     return int(dollars.replace("$", "").replace(",",""))
 
-def analyses(emps):
-    emps["Total gross pay"] = emps["Total gross pay"].apply(lambda x: moneyToInt(x))
-    withheld = emps.loc[emps["Name"] == "(Name withheld)"]
-    print("the", str(pLen(withheld)), "employees with withheld names make up",
-        "{:.0%}".format(1.0*pLen(withheld)/pLen(emps)), "of the", pLen(emps), "employees.",
-        "They cost", intToMoney(withheld["Total gross pay"].sum()), "or",
-        "{:.0%}".format(1.0*withheld["Total gross pay"].sum()/emps["Total gross pay"].sum()),
-        "of the total", intToMoney(emps["Total gross pay"].sum()))
+def to_dollar(moneyInt):
+    return locale.currency( moneyInt, grouping=True )
+
+def pLen(df):
+    return len(df.index)
+
+def get_percent(numerator, denominator):
+    return "{:.0%}".format(1.0*numerator/denominator)
 
 salaries = pd.read_csv(file_loc("VTsalaries.csv"))
 salaries.columns = ['Name', 'Title', 'Pay']
-salaries['Pay'] = salaries['Pay'].map(parse_dollar)
+salaries['Pay'] = salaries['Pay'].map(from_dollar)
 
-myS = list(set(salaries["Title"].tolist()))
+withheld = salaries.loc[salaries["Name"] == "(Name withheld)"]
+SalaryList = list(set(salaries["Title"].tolist()))
+
 with open(file_loc("set of titles.txt"), "w") as f:
-    for item in myS:
-        f.write(item+'\n')
+    for salary in SalaryList:
+        f.write(salary+'\n')
+
+
+words = ["the", str(pLen(withheld)), "employees with withheld names make up",
+    get_percent(pLen(withheld), pLen(salaries)), "of the", str(pLen(salaries)), "employees.",
+    "They cost", to_dollar(withheld["Pay"].sum()), "or",
+    get_percent(withheld["Pay"].sum(), salaries["Pay"].sum()),
+    "of the total", to_dollar(salaries["Pay"].sum())]
+with open(file_loc("stats.txt"), "w") as f:
+    f.write(" ".join(words))
