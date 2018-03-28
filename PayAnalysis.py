@@ -21,14 +21,9 @@ def get_percent(numerator, denominator):
 salaries = pd.read_csv(file_loc("VTsalaries.csv"))
 salaries.columns = ['Name', 'Title', 'Pay']
 salaries['Pay'] = salaries['Pay'].map(from_dollar)
-
 withheld = salaries.loc[salaries["Name"] == "(Name withheld)"]
-SalaryList = list(set(salaries["Title"].tolist()))
 
-with open(file_loc("set of titles.txt"), "w") as f:
-    for salary in SalaryList:
-        f.write(salary+'\n')
-
+salaries["Title"].value_counts().to_csv(file_loc("titles.csv"))
 
 words = ["the", str(pLen(withheld)), "employees with withheld names make up",
     get_percent(pLen(withheld), pLen(salaries)), "of the", str(pLen(salaries)), "employees.",
